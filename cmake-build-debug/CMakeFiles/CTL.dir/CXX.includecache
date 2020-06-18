@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/iulian/Documents/C++/CTL/ctl.h
+iostream
+-
+algorithm
+-
+
+/home/iulian/Documents/C++/CTL/main.cpp
+ctl.h
+/home/iulian/Documents/C++/CTL/ctl.h
+
