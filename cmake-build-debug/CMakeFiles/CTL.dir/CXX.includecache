@@ -6,13 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/home/iulian/Documents/C++/CTL/ctl.h
+/home/iulian/Documents/C++/CTL/ctl/ctl.h
 iostream
 -
 algorithm
 -
 
 /home/iulian/Documents/C++/CTL/main.cpp
-ctl.h
-/home/iulian/Documents/C++/CTL/ctl.h
+ctl/ctl.h
+/home/iulian/Documents/C++/CTL/ctl/ctl.h
 
