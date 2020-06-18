@@ -52,7 +52,7 @@ namespace ctl
     struct [[maybe_unused]] utils
     {
         /**
-         * Struct containing helper functors that update the iterator  on each iteration.
+         * Struct containing helper functors that update the iterator on each iteration.
          *
          * @tparam delta  The amount by which the iterator is changed.
          */
@@ -97,7 +97,7 @@ namespace ctl
             };
         };
 
-        // Some conditional functors below.
+        // Conditional functors to test the loop condition.
         template<T I, T N>
         struct [[maybe_unused]] less_than
         {
@@ -132,6 +132,20 @@ namespace ctl
             {
                 return I != N;
             }
+        };
+
+        // Action functors that print the index to some output stream.
+        template<std::ostream &os, const char sep>
+        struct [[maybe_unused]] out
+        {
+            template<T I>
+            struct [[maybe_unused]] print_index
+            {
+                void operator()() const noexcept
+                {
+                    os << I << sep;
+                }
+            };
         };
     };
 } // namespace ctl
