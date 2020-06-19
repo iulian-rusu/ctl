@@ -1,15 +1,14 @@
-#include "ctl/ctl.h"
+#include "ctl.h"
 // Example of use of ctl.
 // This code will print Fibonacci numbers at compile-time.
 
 // A parametrized struct to generate Fibonacci numbers at compile-time.
-template<size_t N>
+template<unsigned N>
 struct fib
 {
     static const int val = fib<N - 1>::val + fib<N - 2>::val;
 };
 
-// A couple of template specializations for the first two numbers in the sequence.
 template<>
 struct fib<1>
 {
@@ -22,54 +21,48 @@ struct fib<0>
     static const int val = 0;
 };
 
-// A functor struct used to print the numbers.
-// This struct must depend on a template parameter the is compatible with the update and conditional functor.
+// A functor struct used to print the Fibonacci numbers.
 template<unsigned N>
 struct print_fib
 {
     void operator()() const noexcept
     {
-        std::cout << "fib<" << N << "> = " << fib<N>::val << '\n';
+        std::cout << fib<N>::val << ' ';
     }
 };
 
-// This functor will generate a sequence of indices according to a polynomial formula
-template<int I>
-struct poly_recursive
+// This functor is used in a compile-time while loop, it will generate fibonacci numbers using a O(n) algorithm
+// The action functor for a while loop must return a std::integer_sequence with all loop parameters in it
+template<int a, int b, int max>
+struct action
 {
-    constexpr int operator()() const noexcept
+    auto operator()()
     {
-        return 5 * I + 2;
+        std::cout << a << ' ';
+        return std::integer_sequence<int, b, a + b, max>{};
     }
 };
 
-// Action functor that creates another loop inside of the main loop
-template<int I>
-struct nested_loop
+// This functor is the test condition for the while loop
+// (note that some template arguments are not used in the condition but are still required)
+template<int a, int b, int max>
+struct condition
 {
-    void operator()() const noexcept
+    constexpr bool operator()()
     {
-        if (ctl::for_loop<int, I, 0,
-                ctl::utils<int>::updaters<2>::dec,
-                ctl::utils<int>::greater_than,
-                ctl::utils<int>::out<>::print_index>::begin())
-            std::cout << '\n';
+        return a < max;
     }
 };
+
 
 int main()
 {
-
-    std::cout << "Prints the Fibonacci numbers from 0 to 19:\n";
+    std::cout << "Prints the first 20 Fibonacci numbers (in a very non-efficient way):\n";
     ctl::for_loop<unsigned, 0, 20, ctl::utils<unsigned>::updaters<1>::inc, ctl::utils<unsigned>::less_than, print_fib>::begin();
 
-    std::cout << "\nAnd this prints some of them in reverse with a step of 2:\n";
-    ctl::for_loop<unsigned, 25, 10, ctl::utils<unsigned>::updaters<2>::dec, ctl::utils<unsigned>::greater_than, print_fib>::begin();
+    std::cout << "\n\nWe can also do it with a ctl::while_loop, printing the Fibonacci numbers smaller than 10000\n";
+    std::cout << "This way we can calculate the numbers non-recursively:\n";
+    ctl::while_loop<int, condition, action, 0, 1, 10000>::begin();
 
-    std::cout << "\nThis will print a more complicated sequence of numbers to std::cout, separated by a space:\n";
-    ctl::for_loop<int, 0, 99999999, poly_recursive, ctl::utils<int>::less_than, ctl::utils<int>::out<>::print_index>::begin();
-
-    std::cout << "\n\nAnd this will make two nested for loops, where the inner one depends on the outer one:\n";
-    ctl::for_loop<int, 0, 10, ctl::utils<int>::updaters<1>::inc, ctl::utils<int>::less_than, nested_loop>::begin();
 }
 
