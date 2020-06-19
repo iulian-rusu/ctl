@@ -4,20 +4,20 @@
 
 // A parametrized struct to generate Fibonacci numbers at compile-time.
 template<size_t N>
-struct Fib
+struct fib
 {
-    static const int val = Fib<N - 1>::val + Fib<N - 2>::val;
+    static const int val = fib<N - 1>::val + fib<N - 2>::val;
 };
 
 // A couple of template specializations for the first two numbers in the sequence.
 template<>
-struct Fib<1>
+struct fib<1>
 {
     static const int val = 1;
 };
 
 template<>
-struct Fib<0>
+struct fib<0>
 {
     static const int val = 0;
 };
@@ -29,7 +29,7 @@ struct print_fib
 {
     void operator()() const noexcept
     {
-        std::cout << "Fib<" << N << "> = " << Fib<N>::val << '\n';
+        std::cout << "fib<" << N << "> = " << fib<N>::val << '\n';
     }
 };
 
@@ -43,6 +43,20 @@ struct poly_recursive
     }
 };
 
+// Action functor that creates another loop inside of the main loop
+template<int I>
+struct nested_loop
+{
+    void operator()() const noexcept
+    {
+        if (ctl::for_loop<int, I, 0,
+                ctl::utils<int>::updaters<2>::dec,
+                ctl::utils<int>::greater_than,
+                ctl::utils<int>::out<>::print_index>::begin())
+            std::cout << '\n';
+    }
+};
+
 int main()
 {
 
@@ -52,7 +66,10 @@ int main()
     std::cout << "\nAnd this prints some of them in reverse with a step of 2:\n";
     ctl::for_loop<unsigned, 25, 10, ctl::utils<unsigned>::updaters<2>::dec, ctl::utils<unsigned>::greater_than, print_fib>::begin();
 
-    std::cout << "\nAnd this will print a more complicated sequence of numbers to std::cout, separated by a space:\n";
-    ctl::for_loop<int, 0, 1000, poly_recursive, ctl::utils<int>::less_than, ctl::utils<int>::out<std::cout, ' '>::print_index>::begin();
+    std::cout << "\nThis will print a more complicated sequence of numbers to std::cout, separated by a space:\n";
+    ctl::for_loop<int, 0, 99999999, poly_recursive, ctl::utils<int>::less_than, ctl::utils<int>::out<>::print_index>::begin();
+
+    std::cout << "\n\nAnd this will make two nested for loops, where the inner one depends on the outer one:\n";
+    ctl::for_loop<int, 0, 10, ctl::utils<int>::updaters<1>::inc, ctl::utils<int>::less_than, nested_loop>::begin();
 }
 

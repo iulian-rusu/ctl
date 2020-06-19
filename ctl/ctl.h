@@ -11,9 +11,9 @@
 namespace ctl
 {
     /**
-     * Struct used to expand a for begin at compile-time.
+     * Struct used to expand a for loop at compile-time.
      *
-     * @tparam T                    The type used to iterate through the begin.
+     * @tparam T                    The type used to iterate through the loop.
      * @tparam I                    The starting value of the iterator.
      * @tparam N                    The value at which the iterator stops.
      * @tparam update_functor       A functor used to update the iterator on each iteration.
@@ -31,20 +31,24 @@ namespace ctl
         for_loop() = delete;
 
         /**
-         * Static method used to start the begin.
+         * Static method used to start the loop.
+         *
+         * @return true if the loop has executed at least once, otherwise false.
          */
-        static void begin()
+        static constexpr bool begin()
         {
             if constexpr (conditional_functor<I, N>{}())
             {
                 action_functor<I>{}();
                 for_loop<T, update_functor<I>{}(), N, update_functor, conditional_functor, action_functor>::begin();
+                return true;
             }
+            return false;
         }
     };
 
     /**
-     * Struct containing helper functors.
+     * Wrapper struct containing helper functors.
      *
      * @tparam T    The type used for the begin iterator.
      */
@@ -52,7 +56,7 @@ namespace ctl
     struct [[maybe_unused]] utils
     {
         /**
-         * Struct containing helper functors that update the iterator on each iteration.
+         * Wrapper struct for functors that update the iterator.
          *
          * @tparam delta  The amount by which the iterator is changed.
          */
@@ -97,6 +101,32 @@ namespace ctl
             };
         };
 
+        /**
+         * Wrapper struct for functors that output something.
+         *
+         * @tparam sep The character that separates the output.
+         * @tparam os  A std::ostream reference where the output is directed.
+         */
+        template<const char sep = ' ',std::ostream &os = std::cout>
+        struct [[maybe_unused]] out
+        {
+            /**
+             * Prints the index received as a template parameter to some specified output stream.
+             *
+             * @tparam I The index to be printed.
+             */
+            template<T I>
+            struct [[maybe_unused]] print_index
+            {
+                void operator()() const noexcept
+                {
+                    os << I;
+                    if constexpr (sep)
+                        os << sep;
+                }
+            };
+        };
+
         // Conditional functors to test the loop condition.
         template<T I, T N>
         struct [[maybe_unused]] less_than
@@ -133,20 +163,6 @@ namespace ctl
                 return I != N;
             }
         };
-
-        // Action functors that print the index to some output stream.
-        template<std::ostream &os, const char sep>
-        struct [[maybe_unused]] out
-        {
-            template<T I>
-            struct [[maybe_unused]] print_index
-            {
-                void operator()() const noexcept
-                {
-                    os << I << sep;
-                }
-            };
-        };
-    };
+    };// struct utils
 } // namespace ctl
 #endif // CTL_H
