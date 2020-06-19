@@ -3,4 +3,4 @@ project(CTL)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(CTL main.cpp ctl/utils.h)
+add_executable(CTL main.cpp ctl/utils.h ctl/make_functor.h)

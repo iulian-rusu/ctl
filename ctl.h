@@ -3,6 +3,7 @@
 
 #include <utility>
 #include "ctl/utils.h"
+#include "ctl/make_functor.h"
 /**
  * ctl - Compile-Time Loops API
  */
@@ -25,7 +26,7 @@ namespace ctl
             template<T> typename update_functor,
             template<T, T> typename conditional_functor,
             template<T> typename action_functor>
-    struct [[maybe_unused]] for_loop
+    struct for_loop
     {
         for_loop() = delete;
 
@@ -46,20 +47,19 @@ namespace ctl
         }
     }; // struct for_loop
 
-
     /**
      * Struct used to expand a while loop at compile-time.
      *
      * @tparam T                    The type used to iterate through the loop.
      * @tparam conditional_functor  A functor used to verify if the loop is still running.
      * @tparam action_functor       A functor that performs the action on each iteration.
-     * @tparam args                 A pack of template arguments that represents the initial values of all loop parameters.
+     * @tparam Args                 A pack of template arguments that represents the initial values of all loop parameters.
      */
     template<typename T,
             template<T ...> typename conditional_functor,
             template<T ...> typename action_functor,
-            T ... args>
-    struct [[maybe_unused]] while_loop
+            T ... Args>
+    struct while_loop
     {
         while_loop() = delete;
 
@@ -70,24 +70,36 @@ namespace ctl
          */
         static constexpr bool begin() noexcept
         {
-            if constexpr (conditional_functor<args ...>{}())
+            if constexpr (conditional_functor<Args ...>{}())
             {
-                next_iter(action_functor<args ...>{}());
+                next_iter(action_functor<Args ...>{}());
                 return true;
             }
             return false;
         }
 
         /**
+        * Static method used to start a do-while type loop.
+        *
+        * @return                  always true.
+        */
+        static constexpr bool do_while_begin() noexcept
+        {
+            next_iter(action_functor<Args ...>{}());
+            return true;
+        }
+
+        /**
          * Helper static method used to unpack the std::integer_sequence template arguments and pass them to the next iteration
          *
-         * @tparam ints             A pack of template arguments representing the current values of all loop parameters.
+         * @tparam Ints             A pack of template arguments representing the current values of all loop parameters.
          */
-        template<T ... ints>
-        static void next_iter(std::integer_sequence<T, ints ...>) noexcept
+        template<T ... Ints>
+        static constexpr void next_iter(std::integer_sequence<T, Ints ...> &&) noexcept
         {
-            while_loop<T, conditional_functor, action_functor, ints ...>::begin();
+            if constexpr (conditional_functor<Ints ...>{}())
+                next_iter(action_functor<Ints ...>{}());
         };
-    };
+    };// struct while_loop
 } // namespace ctl
 #endif // CTL_H

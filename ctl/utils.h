@@ -2,6 +2,9 @@
 #define CTL_UTILS_H
 
 #include <iostream>
+/**
+ * utils - Some commonly used functors for the ctl API.
+ */
 
 namespace ctl
 {
@@ -11,7 +14,7 @@ namespace ctl
      * @tparam T        The type used for the begin iterator.
      */
     template<typename T>
-    struct [[maybe_unused]] utils
+    struct utils
     {
         /**
          * Wrapper struct for functors that update the iterator.
@@ -19,10 +22,10 @@ namespace ctl
          * @tparam delta    The amount by which the iterator is changed.
          */
         template<T delta>
-        struct [[maybe_unused]] updaters
+        struct update_functors
         {
             template<T I>
-            struct [[maybe_unused]] inc
+            struct inc
             {
                 constexpr T operator()() const noexcept
                 {
@@ -31,7 +34,7 @@ namespace ctl
             };
 
             template<T I>
-            struct [[maybe_unused]] dec
+            struct dec
             {
                 constexpr T operator()() const noexcept
                 {
@@ -40,7 +43,7 @@ namespace ctl
             };
 
             template<T I>
-            struct [[maybe_unused]] mul
+            struct mul
             {
                 constexpr T operator()() const noexcept
                 {
@@ -49,15 +52,15 @@ namespace ctl
             };
 
             template<T I>
-            struct [[maybe_unused]] div
+            struct div
             {
                 constexpr T operator()() const noexcept
                 {
-                    static_assert(delta != 0, "[ctl::utils::updaters::div]: cannot divide by 0");
+                    static_assert(delta != 0, "[ctl::utils::update_functors::div]: cannot divide by 0");
                     return I / delta;
                 }
             };
-        }; // struct updaters
+        }; // struct update_functors
 
         /**
          * Wrapper struct for functors that output something.
@@ -66,7 +69,7 @@ namespace ctl
          * @tparam os       A std::ostream reference where the output is directed.
          */
         template<const char sep = ' ', std::ostream &os = std::cout>
-        struct [[maybe_unused]] out
+        struct output_functors
         {
             /**
              * Prints the index received as a template parameter to some specified output stream.
@@ -74,7 +77,7 @@ namespace ctl
              * @tparam I    The index to be printed.
              */
             template<T I>
-            struct [[maybe_unused]] print_index
+            struct print_index
             {
                 void operator()() const noexcept
                 {
@@ -83,12 +86,12 @@ namespace ctl
                         os << sep;
                 }
             };
-        }; // struct out
+        }; // struct output_functors
 
         // Conditional functors to test the loop condition.
 
         template<T I, T N>
-        struct [[maybe_unused]] less_than
+        struct less_than
         {
             constexpr bool operator()() const noexcept
             {
@@ -97,7 +100,7 @@ namespace ctl
         };
 
         template<T I, T N>
-        struct [[maybe_unused]] greater_than
+        struct greater_than
         {
             constexpr bool operator()() const noexcept
             {
@@ -106,7 +109,7 @@ namespace ctl
         };
 
         template<T I, T N>
-        struct [[maybe_unused]] equ
+        struct equ
         {
             constexpr bool operator()() const noexcept
             {
@@ -115,7 +118,7 @@ namespace ctl
         };
 
         template<T I, T N>
-        struct [[maybe_unused]] not_equ
+        struct not_equ
         {
             constexpr bool operator()() const noexcept
             {
