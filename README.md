@@ -7,5 +7,5 @@ It is meant to show the difference between a run-time and compile-time recursive
 
 The functionality is achieved with some template tricks and using C++17's `if constexpr`. 
 A run-time recursive algorithm will usually take several seconds to calculate the first 40 Fibonacci term, using `ctl::for_loop` will print the answer almost immediately,
-at the cost of a some small compilation overhead.
+at the cost of a small compilation overhead. You can also use `ctl::while_loop` to calculate the numbers easier.
 
