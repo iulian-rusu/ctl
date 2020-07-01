@@ -1,6 +1,6 @@
 # Compile-Time Loops in C++
 
-This is a small project focused on making a custom version of compile-time loops.
+Some playing around with template metaprogramming in C++.
 The `main.cpp` file contains a driver program that will print some of the Fibonacci sequence, all the numbers being calculated at compile-time.
 The focus of the test program is not efficiency, as there are far better ways to calculate the Fibonacci numbers that do no involve recurson.
 It is meant to show the difference between a run-time and compile-time recursive calculation of the Fibonacci numbers.
